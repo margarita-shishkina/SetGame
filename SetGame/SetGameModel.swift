@@ -9,9 +9,10 @@
 import Foundation
 
 class SetGameModel {
-    private var cards: [Card]
+    private(set) var cardDeck: [Card]
     private(set) var cardsInGame: [Card]
-    private var selectedIndecies: Set<Int> = []
+    private(set) var selectedCards: [Card] = []
+    private(set) var matchedCards: [Card] = []
     private(set) var score = 0
     
     init() {
@@ -25,38 +26,51 @@ class SetGameModel {
                 })
             })
         })
-        self.cards = cards
+        self.cardDeck = cards
         
         cardsInGame = []
         for _ in 0..<12 {
-            cardsInGame.append(self.cards.removeRand())
+            cardsInGame.append(self.cardDeck.removeRand())
         }
     }
     
     func deal3MoreCards() {
-        
+        if selectedCardIsMatched() {
+            replaceSelectedCards()
+            selectedCards = []
+        } else if cardDeck.count != 0 {
+            (0..<3).forEach({ _ in cardsInGame.append(cardDeck.removeRand()) })
+        }
     }
     
     func chooseCard(at index: Int) {
-        if cardsInGame[index].isSelected {
-            cardsInGame[index].isSelected = false
-            selectedIndecies.remove(index)
-        } else if selectedIndecies.count < 2 {
-            cardsInGame[index].isSelected = true
-            selectedIndecies.insert(index)
-        } else {
-            selectedIndecies.insert(index)
-            let first = cardsInGame[selectedIndecies.removeFirst()]
-            let second = cardsInGame[selectedIndecies.removeFirst()]
-            let third = cardsInGame[selectedIndecies.removeFirst()]
-            
-            if Card.isEqual(first: first, second: second, third: third) {
-                selectedIndecies.forEach({ cardsInGame.remove(at: $0) })
-                score += 1
-            } else {
-                selectedIndecies.forEach({ cardsInGame[$0].isSelected = false })
+        let card = cardsInGame[index]
+        if let selectedIndex = selectedCards.index(of: card), selectedCards.count < 3 {
+            selectedCards.remove(at: selectedIndex)
+        } else if selectedCards.count < 2 {
+            selectedCards.append(card)
+        } else if selectedCards.count == 2 {
+            let fisrt = selectedCards[0]
+            let second = selectedCards[1]
+            if Card.isMatch(first: fisrt, second: second, third: card) {
+                matchedCards += [fisrt, second, card]
             }
-            selectedIndecies = []
+            selectedCards.append(card)
+        } else if selectedCards.count == 3 {
+            if selectedCardIsMatched() { replaceSelectedCards() }
+            selectedCards = [card]
         }
+    }
+    
+    func selectedCardIsMatched() -> Bool {
+        return selectedCards.filter({ matchedCards.contains($0) }).count == 3
+    }
+    
+    private func replaceSelectedCards() {
+        if cardDeck.count == 0 { return }
+        selectedCards.forEach({ card in
+            let index = cardsInGame.index(of: card)
+            cardsInGame[index!] = cardDeck.removeRand()
+        })
     }
 }

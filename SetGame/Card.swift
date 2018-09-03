@@ -8,20 +8,20 @@
 
 import Foundation
 
-struct Card {
-    enum Color: Int, EnumSequence, CardFeaturesEquatable {
+struct Card: Equatable {
+    enum Color: Int, EnumSequence, CardFeaturesMatched {
         typealias T = Color
         case red, green, purple
     }
-    enum Number: Int, EnumSequence, CardFeaturesEquatable {
+    enum Number: Int, EnumSequence, CardFeaturesMatched {
         typealias T = Number
         case one, two, three
     }
-    enum Symbol: Int, EnumSequence, CardFeaturesEquatable {
+    enum Symbol: Int, EnumSequence, CardFeaturesMatched {
         typealias T = Symbol
         case diamond, squiggle, oval
     }
-    enum Shading: Int, EnumSequence, CardFeaturesEquatable {
+    enum Shading: Int, EnumSequence, CardFeaturesMatched {
         typealias T = Shading
         case solid, striped, open
     }
@@ -30,8 +30,6 @@ struct Card {
     let nubmer: Number
     let symbol: Symbol
     let shading: Shading
-
-    var isSelected = false
     
     init(color: Color, number: Number, symbol: Symbol, shading: Shading) {
         self.color = color
@@ -40,21 +38,21 @@ struct Card {
         self.shading = shading
     }
     
-    static func isEqual(first: Card, second: Card, third: Card) -> Bool {
-        return Color.isEqual(first: first.color, second: second.color, third: third.color)
-               && Number.isEqual(first: first.nubmer, second: second.nubmer, third: third.nubmer)
-               && Symbol.isEqual(first: first.symbol, second: second.symbol, third: third.symbol)
-               && Shading.isEqual(first: first.shading, second: second.shading, third: third.shading)
+    static func isMatch(first: Card, second: Card, third: Card) -> Bool {
+        return Color.isMatch(first: first.color, second: second.color, third: third.color)
+               && Number.isMatch(first: first.nubmer, second: second.nubmer, third: third.nubmer)
+               && Symbol.isMatch(first: first.symbol, second: second.symbol, third: third.symbol)
+               && Shading.isMatch(first: first.shading, second: second.shading, third: third.shading)
     }
 }
 
-protocol CardFeaturesEquatable {
+protocol CardFeaturesMatched {
     associatedtype T: RawRepresentable where T.RawValue == Int
-    static func isEqual(first: T, second: T, third: T) -> Bool
+    static func isMatch(first: T, second: T, third: T) -> Bool
 }
 
-extension CardFeaturesEquatable {
-    static func isEqual(first: T, second: T, third: T) -> Bool {
+extension CardFeaturesMatched {
+    static func isMatch(first: T, second: T, third: T) -> Bool {
         if first == second && second == third {
             return true
         } else if first != second && second != third && first != third {
