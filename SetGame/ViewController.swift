@@ -44,14 +44,14 @@ class SetGameViewController: UIViewController {
             let card = game.cardsInGame[index]
             cardButtons[index].setAttributedTitle(getAttributedString(for: card), for: .normal)
             
-            if game.matchedCards.contains(card) && game.selectedCards.contains(card) {
-                cardButtons[index].layer.borderColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
-            } else if game.selectedCards.contains(card) && game.selectedCards.count == 3 {
-                cardButtons[index].layer.borderColor = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
-            } else if game.selectedCards.contains(card) {
-                cardButtons[index].layer.borderColor = #colorLiteral(red: 0.9813671708, green: 0.6461395025, blue: 0.1477707922, alpha: 1)
-            } else if game.matchedCards.contains(card) {
+            if game.matchedCards.contains(card) {
                 cardButtons[index].isHidden = true
+            } else if game.selectedCards.contains(card) {
+                if game.selectedCards.count == 3 {
+                    cardButtons[index].layer.borderColor = game.selectedCardIsMatched() ? #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1) : #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
+                } else {
+                    cardButtons[index].layer.borderColor = #colorLiteral(red: 0.9813671708, green: 0.6461395025, blue: 0.1477707922, alpha: 1)
+                }
             } else {
                 cardButtons[index].layer.borderColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
             }

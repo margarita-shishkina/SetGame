@@ -36,34 +36,34 @@ class SetGameModel {
     
     func deal3MoreCards() {
         if selectedCardIsMatched() {
+            matchedCards.append(contentsOf: selectedCards)
             replaceSelectedCards()
             selectedCards = []
-        } else if cardDeck.count != 0 {
-            (0..<3).forEach({ _ in cardsInGame.append(cardDeck.removeRand()) })
+        } else {
+            appendCards()
         }
     }
     
     func chooseCard(at index: Int) {
         let card = cardsInGame[index]
-        if let selectedIndex = selectedCards.index(of: card), selectedCards.count < 3 {
-            selectedCards.remove(at: selectedIndex)
-        } else if selectedCards.count < 2 {
-            selectedCards.append(card)
-        } else if selectedCards.count == 2 {
-            let fisrt = selectedCards[0]
-            let second = selectedCards[1]
-            if Card.isMatch(first: fisrt, second: second, third: card) {
-                matchedCards += [fisrt, second, card]
+        if selectedCards.count < 3 {
+            if let selectedIndex = selectedCards.index(of: card) {
+                selectedCards.remove(at: selectedIndex)
+            } else {
+                selectedCards.append(card)
             }
-            selectedCards.append(card)
-        } else if selectedCards.count == 3 {
-            if selectedCardIsMatched() { replaceSelectedCards() }
+        } else {
+            if selectedCardIsMatched() {
+                matchedCards.append(contentsOf: selectedCards)
+                replaceSelectedCards()
+            }
             selectedCards = [card]
         }
     }
     
     func selectedCardIsMatched() -> Bool {
-        return selectedCards.filter({ matchedCards.contains($0) }).count == 3
+        if selectedCards.count < 3 { return false }
+        return Card.isMatch(first: selectedCards[0], second: selectedCards[1], third: selectedCards[2])
     }
     
     private func replaceSelectedCards() {
@@ -72,5 +72,10 @@ class SetGameModel {
             let index = cardsInGame.index(of: card)
             cardsInGame[index!] = cardDeck.removeRand()
         })
+    }
+    
+    private func appendCards() {
+        if cardDeck.count == 0 { return }
+        (0..<3).forEach({ _ in cardsInGame.append(cardDeck.removeRand()) })
     }
 }
