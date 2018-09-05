@@ -10,16 +10,14 @@ import Foundation
 @testable import SetGame
 
 struct Utils {
-    static func findMatch(cards: [Card], matched: [Card]) -> (first: Int, second: Int, third: Int)? {
+    static func findMatchIndecies(cards: [Card?]) -> [Int]? {
         let count = cards.count
         for i in 0..<(count-2) {
             for j in i+1..<(count-1) {
                 for k in j+1..<count {
-                    let first = cards[i]
-                    let second = cards[j]
-                    let third = cards[k]
-                    if Card.isMatch(first: first, second: second, third: third) && !matched.contains(first) && !matched.contains(second) && !matched.contains(third) {
-                        return (i, j, k)
+                    guard let first = cards[i], let second = cards[j], let third = cards[k] else { continue }
+                    if Card.isMatch(cards: [first, second, third ]) {
+                        return [i, j, k]
                     }
                 }
             }
@@ -27,10 +25,10 @@ struct Utils {
         return nil
     }
     
-    static func getRandNotMatchIndex(mathedIndecies: (first: Int, second: Int, third: Int), cards: [Card]) -> Int {
+    static func getRandNotMatchIndex(mathedIndecies: [Int], cards: [Card?]) -> Int {
         while true {
             let rand = cards.count.rand
-            if rand != mathedIndecies.first && rand != mathedIndecies.second && rand != mathedIndecies.third {
+            if !mathedIndecies.contains(rand) && cards[rand] != nil {
                 return rand
             }
         }

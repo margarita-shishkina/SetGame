@@ -22,9 +22,9 @@ class SetGameTests: XCTestCase {
         super.tearDown()
     }
     
-    func testCardDeckCountIsValid() {
-        XCTAssertEqual(game.cardDeck.count, 81 - 12, "Count cards in deck is wrong")
-    }
+//    func testCardDeckCountIsValid() {
+//        XCTAssertEqual(game.cardDeck.count, 81 - 12, "Count cards in deck is wrong")
+//    }
     
     func testCardInGameCountIsValid() {
         XCTAssertEqual(game.cardsInGame.count, 12, "Count cards in game is wrong")
@@ -42,10 +42,10 @@ class SetGameTests: XCTestCase {
     }
     
     func testCardMatch() {
-        if let matchIndecies = Utils.findMatch(cards: game.cardsInGame, matched: game.matchedCards) {
-            game.chooseCard(at: matchIndecies.first)
-            game.chooseCard(at: matchIndecies.second)
-            game.chooseCard(at: matchIndecies.third)
+        if let matchIndecies = Utils.findMatchIndecies(cards: game.cardsInGame) {
+            game.chooseCard(at: matchIndecies[0])
+            game.chooseCard(at: matchIndecies[1])
+            game.chooseCard(at: matchIndecies[2])
             XCTAssert(game.selectedCardIsMatched(), "Match not working")
         }
     }
@@ -54,13 +54,13 @@ class SetGameTests: XCTestCase {
         var match = 0
     
         while true {
-            let matchIndecies = Utils.findMatch(cards: game.cardsInGame, matched: game.matchedCards)
-            if matchIndecies == nil && game.cardDeck.count == 0 { break }
+            let matchIndecies = Utils.findMatchIndecies(cards: game.cardsInGame)
+            if matchIndecies == nil && game.cardDeck.isEmpty { break }
 
             if let matchIndecies = matchIndecies {
-                game.chooseCard(at: matchIndecies.first)
-                game.chooseCard(at: matchIndecies.second)
-                game.chooseCard(at: matchIndecies.third)
+                game.chooseCard(at: matchIndecies[0])
+                game.chooseCard(at: matchIndecies[1])
+                game.chooseCard(at: matchIndecies[2])
                 
                 let notMatchIndex = Utils.getRandNotMatchIndex(mathedIndecies: matchIndecies, cards: game.cardsInGame)
                 game.chooseCard(at: notMatchIndex)
@@ -71,7 +71,7 @@ class SetGameTests: XCTestCase {
             }
         }
         
-        let countNotMatchCard = game.cardsInGame.filter({ !game.matchedCards.contains($0) }).count
+        let countNotMatchCard = game.cardsInGame.compactMap({ $0 }).count
         let allCards = match * 3 + countNotMatchCard
         
         XCTAssert(allCards == 81, "Find all match failed")
